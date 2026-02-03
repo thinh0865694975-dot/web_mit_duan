@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý Thể loại</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container mt-4">
+
+    <h3>📂 Quản lý Thể loại</h3>
+
+    <button class="btn btn-success mb-2" onclick="openAdd()">➕ Thêm thể loại</button>
+
+    <table class="table table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên thể loại</th>
+                <th width="150">Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody id="categoryTable">
+            <tr>
+                <td>1</td>
+                <td>CNTT</td>
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                        onclick="openEdit(1,'CNTT')">Sửa</button>
+                    <button class="btn btn-danger btn-sm"
+                        onclick="deleteCategory(this)">Xóa</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm thể loại</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="catId">
+
+                <div class="mb-2">
+                    <label>ID thể loại</label>
+                    <input type="text" id="catIdView" class="form-control" disabled>
+                </div>
+
+                <div class="mb-2">
+                    <label>Tên thể loại</label>
+                    <input type="text" id="catName" class="form-control">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button class="btn btn-primary" onclick="saveCategory()">Lưu</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+let table = document.getElementById('categoryTable');
+let autoId = 2;
+
+// Thêm
+function openAdd() {
+    document.getElementById('modalTitle').innerText = "Thêm thể loại";
+    document.getElementById('catId').value = "";
+    document.getElementById('catIdView').value = autoId;
+    document.getElementById('catName').value = "";
+    modal.show();
+}
+
+// Sửa
+function openEdit(id, name) {
+    document.getElementById('modalTitle').innerText = "Sửa thể loại";
+    document.getElementById('catId').value = id;
+    document.getElementById('catIdView').value = id;
+    document.getElementById('catName').value = name;
+    modal.show();
+}
+
+// Lưu
+function saveCategory() {
+    let id = document.getElementById('catId').value;
+    let name = document.getElementById('catName').value;
+
+    if (name.trim() === "") {
+        alert("Tên thể loại không được để trống!");
+        return;
+    }
+
+    if (id === "") {
+        // Thêm
+        let row = `
+        <tr>
+            <td>${autoId}</td>
+            <td>${name}</td>
+            <td>
+                <button class="btn btn-warning btn-sm"
+                    onclick="openEdit(${autoId},'${name}')">Sửa</button>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteCategory(this)">Xóa</button>
+            </td>
+        </tr>`;
+        table.innerHTML += row;
+        autoId++;
+    } else {
+        // Sửa
+        for (let r of table.rows) {
+            if (r.cells[0].innerText == id) {
+                r.cells[1].innerText = name;
+            }
+        }
+    }
+
+    modal.hide();
+}
+
+// Xóa
+function deleteCategory(btn) {
+    if (confirm("Bạn có chắc muốn xóa thể loại này?")) {
+        btn.closest("tr").remove();
+    }
+}
+</script>
+
+</body>
+</html>

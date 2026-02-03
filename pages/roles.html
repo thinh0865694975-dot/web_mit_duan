@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Roles</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-3">
+    <h3>🔐 Quản lý Role</h3>
+
+    <button class="btn btn-success mb-2" id="btnAddRole">➕ Thêm Role</button>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên Role</th>
+                <th width="150">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="roleTable">
+            <tr>
+                <td>1</td>
+                <td>Admin</td>
+                <td class="text-center">
+                    <button class="btn btn-warning btn-sm btnEdit">Sửa</button>
+                    <button class="btn btn-danger btn-sm btnDelete">Xóa</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- MODAL THÊM / SỬA ROLE -->
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm / Sửa Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="roleForm">
+                    <input type="hidden" id="role_id">
+
+                    <div class="mb-2">
+                        <label>Tên Role</label>
+                        <input type="text" id="role_name" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnSaveRole">Lưu</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(function () {
+
+    let roleModal = new bootstrap.Modal(document.getElementById('roleModal'));
+
+    // Thêm role
+    $('#btnAddRole').click(function () {
+        $('#roleForm')[0].reset();
+        $('#role_id').val('');
+        roleModal.show();
+    });
+
+    // Sửa role
+    $(document).on('click', '.btnEdit', function () {
+        let row = $(this).closest('tr');
+
+        $('#role_id').val(row.find('td:eq(0)').text());
+        $('#role_name').val(row.find('td:eq(1)').text());
+
+        roleModal.show();
+    });
+
+    // Xóa role
+    $(document).on('click', '.btnDelete', function () {
+        if (confirm('Bạn có chắc muốn xóa role này?')) {
+            $(this).closest('tr').remove();
+        }
+    });
+
+    // Lưu role (demo frontend)
+    $('#btnSaveRole').click(function () {
+
+        let id = $('#role_id').val();
+        let name = $('#role_name').val();
+
+        if (id === '') {
+            // Thêm mới
+            let newRow = `
+                <tr>
+                    <td>${Date.now()}</td>
+                    <td>${name}</td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm btnEdit">Sửa</button>
+                        <button class="btn btn-danger btn-sm btnDelete">Xóa</button>
+                    </td>
+                </tr>`;
+            $('#roleTable').append(newRow);
+        } else {
+            // Cập nhật
+            let row = $('#roleTable tr').filter(function () {
+                return $(this).find('td:first').text() === id;
+            });
+            row.find('td:eq(1)').text(name);
+        }
+
+        roleModal.hide();
+    });
+
+});
+</script>
+
+</body>
+</html>

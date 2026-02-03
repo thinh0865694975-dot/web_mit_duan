@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chi tiết mượn trả</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h3>📚 Chi tiết phiếu mượn</h3>
+
+    <div class="alert alert-info">
+        <strong>Mã phiếu mượn:</strong> <span id="maphieu">1</span>
+    </div>
+
+    <button class="btn btn-success mb-2" onclick="openAdd()">➕ Thêm sách</button>
+
+    <table class="table table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên sách</th>
+                <th>Số lượng</th>
+                <th>Ngày trả</th>
+                <th>Tình trạng</th>
+                <th width="160">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="detailTable">
+            <tr>
+                <td>1</td>
+                <td>Lập trình C++</td>
+                <td>1</td>
+                <td></td>
+                <td>Chưa trả</td>
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                        onclick="openEdit(1,'Lập trình C++',1,'','Chưa trả')">
+                        Sửa
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteDetail(this)">Xóa</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm sách mượn</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="detailId">
+
+                <div class="mb-2">
+                    <label>ID chi tiết</label>
+                    <input type="text" id="detailIdView" class="form-control" disabled>
+                </div>
+
+                <div class="mb-2">
+                    <label>Tên sách</label>
+                    <input type="text" id="tensach" class="form-control">
+                </div>
+
+                <div class="mb-2">
+                    <label>Số lượng</label>
+                    <input type="number" id="soluong" class="form-control" min="1">
+                </div>
+
+                <div class="mb-2">
+                    <label>Ngày trả</label>
+                    <input type="date" id="ngaytra" class="form-control">
+                </div>
+
+                <div class="mb-2">
+                    <label>Tình trạng</label>
+                    <select id="tinhtrang" class="form-control">
+                        <option>Chưa trả</option>
+                        <option>Đã trả</option>
+                        <option>Mất sách</option>
+                        <option>Hư hỏng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button class="btn btn-primary" onclick="saveDetail()">Lưu</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let modal = new bootstrap.Modal(document.getElementById('detailModal'));
+let table = document.getElementById('detailTable');
+let autoId = 2;
+
+// Thêm
+function openAdd() {
+    document.getElementById('modalTitle').innerText = "Thêm sách mượn";
+    document.getElementById('detailId').value = "";
+    document.getElementById('detailIdView').value = autoId;
+    document.getElementById('tensach').value = "";
+    document.getElementById('soluong').value = 1;
+    document.getElementById('ngaytra').value = "";
+    document.getElementById('tinhtrang').value = "Chưa trả";
+    modal.show();
+}
+
+// Sửa
+function openEdit(id, tensach, soluong, ngaytra, tinhtrang) {
+    document.getElementById('modalTitle').innerText = "Sửa chi tiết mượn";
+    document.getElementById('detailId').value = id;
+    document.getElementById('detailIdView').value = id;
+    document.getElementById('tensach').value = tensach;
+    document.getElementById('soluong').value = soluong;
+    document.getElementById('ngaytra').value = ngaytra;
+    document.getElementById('tinhtrang').value = tinhtrang;
+    modal.show();
+}
+
+// Lưu
+function saveDetail() {
+    let id = document.getElementById('detailId').value;
+    let tensach = document.getElementById('tensach').value;
+    let soluong = document.getElementById('soluong').value;
+    let ngaytra = document.getElementById('ngaytra').value;
+    let tinhtrang = document.getElementById('tinhtrang').value;
+
+    if (tensach.trim() === "" || soluong <= 0) {
+        alert("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+
+    if (id === "") {
+        let row = `
+            <tr>
+                <td>${autoId}</td>
+                <td>${tensach}</td>
+                <td>${soluong}</td>
+                <td>${ngaytra}</td>
+                <td>${tinhtrang}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                        onclick="openEdit(${autoId},'${tensach}',${soluong},'${ngaytra}','${tinhtrang}')">
+                        Sửa
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteDetail(this)">Xóa</button>
+                </td>
+            </tr>
+        `;
+        table.innerHTML += row;
+        autoId++;
+    } else {
+        for (let r of table.rows) {
+            if (r.cells[0].innerText == id) {
+                r.cells[1].innerText = tensach;
+                r.cells[2].innerText = soluong;
+                r.cells[3].innerText = ngaytra;
+                r.cells[4].innerText = tinhtrang;
+            }
+        }
+    }
+    modal.hide();
+}
+
+// Xóa
+function deleteDetail(btn) {
+    if (confirm("Xóa sách này khỏi phiếu mượn?")) {
+        btn.closest("tr").remove();
+    }
+}
+</script>
+
+</body>
+</html>
