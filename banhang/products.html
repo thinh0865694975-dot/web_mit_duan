@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Danh sách sản phẩm</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+.product-card img{
+    height:220px;
+    object-fit:cover;
+}
+a{text-decoration:none;color:inherit}
+</style>
+</head>
+
+<body>
+
+<div class="container mt-4">
+    <h3 class="mb-4">Danh sách sản phẩm</h3>
+    <div class="row" id="product-list"></div>
+</div>
+
+<script>
+$(function () {
+
+    $.getJSON("/banhang/api/products.php", function (data) {
+
+        let html = "";
+
+        data.forEach(p => {
+            html += `
+            <div class="col-md-3 mb-4">
+                <div class="card product-card h-100">
+                    
+
+                    <!-- ẢNH -->
+                    <a href="/banhang/product_detail.html?id=${p.product_id}">
+                        <img src="${p.image_url}" class="card-img-top">
+                    </a>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <!-- TÊN -->
+                        <a href="/banhang/product_detail.html?id=${p.product_id}">
+                            <h6 class="fw-bold">${p.product_name}</h6>
+                        </a>
+
+                        <p class="text-danger fw-bold mb-2">
+                            ${Number(p.price).toLocaleString()} đ
+                        </p>
+
+                        <!-- GIỎ HÀNG -->
+                        <button 
+                            class="btn btn-sm btn-primary mt-auto btn-add-cart"
+                            data-id="${p.product_id}">
+                            🛒 Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        $("#product-list").html(html);
+    });
+
+    // CLICK THÊM VÀO GIỎ (KHÔNG LOAD TRANG)
+    $(document).on("click", ".btn-add-cart", function (e) {
+        e.preventDefault();
+
+        let id = $(this).data("id");
+        let btn = $(this);
+
+        $.post("/banhang/api/cart.php", { product_id: id }, function () {
+            btn.text("✔ Đã thêm")
+               .removeClass("btn-primary")
+               .addClass("btn-success")
+               .prop("disabled", true);
+        });
+    });
+
+});
+</script>
+<script>
+function updateCartCount() {
+    $.getJSON("/banhang/api/cart.php?action=list", function (data) {
+        let count = 0;
+        data.forEach(p => count += parseInt(p.qty));
+        count > 0 ? $("#cart-count").text(count).show() : $("#cart-count").hide();
+    });
+}
+$(function(){ updateCartCount(); });
+</script>
+
+</body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/banhang/products.html">
+            🛍️ Bán Hàng
+        </a>
+
+        <div class="ms-auto">
+            <a href="/banhang/cart.html"
+               class="btn btn-outline-primary position-relative">
+                🛒 Giỏ hàng
+                <span id="cart-count"
+                      class="position-absolute top-0 start-100 translate-middle
+                             badge rounded-pill bg-danger">
+                    0
+                </span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+</html>
